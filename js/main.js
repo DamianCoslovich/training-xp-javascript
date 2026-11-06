@@ -21,41 +21,99 @@ function evaluarProgreso(totalXP, goalXP) {
     }
 }
 
+function registrarEntrenamiento() {
+    let entrada = prompt("Cuantas horas entrenaste?")
+    if (entrada === null) {
+        return
+    }
+    let horas = parseFloat(entrada)
+    if (!isNaN(horas) && horas > 0) {
+        let xpGanada = calcularXP(horas, xpPorHora)
+        totalHoras = totalHoras + horas
+        totalXP = totalXP + xpGanada
+        alert("Sumaste " + horas + " hs y ganaste " + xpGanada + " XP.")
+    } else {
+        alert("Por favor, ingresa una cantidad de horas valida.")
+    }
+}
+
+function mostrarRutina(lista) {
+    let mensaje = "=== REPORT FINAL: RUTINA DE ENTRENAMIENTO ==="
+    for (const ejercicio of lista) {
+        mensaje += "- " + ejercicio + "\n"
+    }
+    alert(mensaje)
+}
+
+function agregarEjercicioInicio(lista) {
+    let nuevo = prompt("Que ejercicio queres agregar al inicio de tu rutina?")
+    if (nuevo !== null && nuevo.trim() !== "") {
+        lista.unshift(nuevo.trim())
+        alert(nuevo + " se agrego al inicio de la rutina!")
+    }
+}
+function eliminarUltimoEjercicio(lista) {
+    if (lista.length > 0) {
+        let eliminado = lista.pop()
+        alert("Se elimino el ultimo ejercicio de tu rutina: " + eliminado)
+    } else {
+        alert("No quedan ejericios para eliminar.")
+    }
+}
+
+function buscarEjercicio(lista) {
+    let buscado = prompt("Que ejercicio queres consultar?")
+    if (buscado === null) return
+
+    if (lista.includes(buscado)) {
+        let posicion = lista.indexOf(buscado)
+        alert("El ejercicio " + buscado + " esta en la rutina(posicion " + (posicion + 1) + ").")
+    } else {
+        alert("El ejericio " + buscado + " no esta en la rutina.")
+    }
+}
+
+function reemplazarEjercicio(lista) {
+    let viejo = prompt("Que ejercicio queres reemplazar?")
+    if (viejo === null) return
+
+    let posicion = lista.indexOf(viejo)
+    if (posicion !== -1) {
+        let nuevo = prompt("Por cual queres reemplazar a " + viejo + "?")
+        if (nuevo !== null && nuevo.trim() !== "") {
+            lista.splice(posicion, 1, nuevo.trim())
+            alert("Listo! Se cambio " + viejo + " por " + nuevo + ".")
+        }
+    } else {
+        alert("El ejercicio " + viejo + " no existe en la rutina.")
+    }
+}
+
+let ejercicios = ["Biceps", "Piernas", "Espalda", "Pecho", "Abdominales"]
+
 while (continuar) {
     const opcion = prompt("Hola " + nombre + ", elegi una opcion: \n" +
         "1. Registrar nuevo entrenamiento \n" +
         "2. Consultar horas acumuladas \n" +
         "3. Consultar XP acumulada y estado \n" +
-        "4. Salir"
+        "4. Ver rutina completa \n" +
+        "5. Agregar ejercicio al inicio \n" +
+        "6. Eliminar ultimo ejercicio \n" +
+        "7. Buscar ejercicio \n" +
+        "8. Reemplaza un ejercicio\n" +
+        "9. Salir"
     )
 
-    if (opcion === null) {
-        alert("Programa cancelado.")
+    if (opcion === null || opcion === "9") {
+        alert("Gracias por entrenar, " + nombre + "! Resumen final:" + totalHoras + " hs y " + totalXP + " XP.")
         continuar = false
         break
     }
 
     switch (opcion) {
-        case "1": {
-            let entrada = prompt("Cuantas horas entrenaste?")
-
-            if (entrada === null) {
-                break
-            }
-            let horas = parseFloat(entrada)
-            if (!isNaN(horas) && horas > 0) {
-                let xpGanada = calcularXP(horas, xpPorHora)
-
-                totalHoras = totalHoras + horas
-                totalXP = totalXP + xpGanada
-                alert("Sumaste " + horas + " hs y ganaste " + xpGanada + " XP.")
-            } else {
-                alert("Por favor, ingresa una cantidad de horas valida.")
-            }
+        case "1":
+            registrarEntrenamiento()
             break
-        }
-
-
         case "2":
             alert("Llevas entrenadas un total de " + totalHoras + " horas.")
             break
@@ -63,9 +121,21 @@ while (continuar) {
             alert("XP Acumulada: " + totalXP + " / " + goalXP + " XP. \n" + "Estado: " + evaluarProgreso(totalXP, goalXP))
             break
         case "4":
-            alert("Gracias por entrenar, " + nombre + "! Resumen final: " + totalHoras + "hs y " + totalXP + " XP.")
-            continuar = false
+            mostrarRutina(ejercicios)
             break
+        case "5":
+            agregarEjercicioInicio(ejercicios)
+            break
+        case "6":
+            eliminarUltimoEjercicio(ejercicios)
+            break
+        case "7":
+            buscarEjercicio(ejercicios)
+            break
+        case "8":
+            reemplazarEjercicio(ejercicios)
+            break
+
         default:
             alert("Opcion no valida.")
             break
@@ -73,31 +143,4 @@ while (continuar) {
 }
 console.log(nombre + ", obtuviste " + totalXP + " XP esta semana")
 
-let ejercicios = ["Biceps", "Piernas", "Espalda", "Pecho", "Abdominales"]
-console.log("Rutina base inicial:", ejercicios)
 
-let ejercicioEliminado = ejercicios.pop()
-console.log("Se quito del final:", ejercicioEliminado)
-
-ejercicios.unshift("Warm up")
-console.log("Rutina con inicio prioritario:", ejercicios)
-
-let ejerciciosConsultado = "Piernas"
-if (ejercicios.includes(ejerciciosConsultado)){
-    let posicion = ejercicios.indexOf(ejerciciosConsultado)
-    console.log("El ejercicio "+ ejerciciosConsultado + " esta en la rutina.")
-    console.log("Posicion en la lista (indice): " + posicion)
-} else {
-    console.log("El ejercicio " + ejerciciosConsultado + " no esta en la rutina.")
-}
-
-ejercicios.splice(2,1,"Hombros")
-console.log("Rutina actualizada con splice:", ejercicios)
-
-function mostrarRutina(listaEjercicios){
-    console.log("=== REPORT FINAL: RUTINA DE ENTRENAMIENTO ===")
-    for (const ejercicio of listaEjercicios){
-        console.log("- " + ejercicio)
-    }
-}
-mostrarRutina(ejercicios)
