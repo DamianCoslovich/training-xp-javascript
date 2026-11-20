@@ -1,15 +1,24 @@
 const xpPorHora = 60
 const goalXP = 1000
 
-const nombre = prompt("Como te llamas?")
-
 let totalXP = 0
 let totalHoras = 0
 let continuar = true
 
-const calcularXP = (horas, xpPorHora) => {
-    return horas * xpPorHora
+class Ejercicio {
+    constructor(id, nombre, series, repeticiones, peso) {
+        this.id = id
+        this.nombre = nombre
+        this.series = series
+        this.repeticiones = repeticiones
+        this.peso = peso
+    }
+    calcularVolumen() {
+        return this.series * this.repeticiones * this.peso
+    }
 }
+
+const calcularXP = (horas, xpPorHora) => horas * xpPorHora
 
 function evaluarProgreso(totalXP, goalXP) {
     if (totalXP >= goalXP) {
@@ -38,26 +47,34 @@ function registrarEntrenamiento() {
 }
 
 function mostrarRutina(lista) {
-    let mensaje = "=== REPORT FINAL: RUTINA DE ENTRENAMIENTO ==="
-    for (const ejercicio of lista) {
-        mensaje += "- " + ejercicio + "\n"
+    let mensaje = "=== REPORT FINAL: RUTINA DE ENTRENAMIENTO ===\n"
+    for (const ej of lista) {
+        mensaje +=  ej.nombre + " - " + ej.series + "x" + ej.repeticiones + " con " + ej.peso + "kg (volumen: " + ej.calcularVolumen() + "kg) \n"
     }
     alert(mensaje)
 }
 
 function agregarEjercicioInicio(lista) {
     let nuevo = prompt("Que ejercicio queres agregar al inicio de tu rutina?")
-    if (nuevo !== null && nuevo.trim() !== "") {
-        lista.unshift(nuevo.trim())
-        alert(nuevo + " se agrego al inicio de la rutina!")
+    if (nuevo === null || nuevo.trim() === "") {
+        alert("No se indico nombre.")
+        return
     }
+    let series = parseInt(prompt("Cantidad de series:"))
+    let reps = parseInt(prompt("Cantidad de repeticiones:"))
+    let peso = parseInt(prompt("Peso en kg:")) || 0
+
+    let nuevoEjercicio = new Ejercicio(lista.length + 1, nuevo.trim(), series, reps, peso)
+    lista.unshift(nuevoEjercicio)
+    alert(nuevoEjercicio.nombre+ " se agrego al inicio de la rutina!") 
 }
+
 function eliminarUltimoEjercicio(lista) {
     if (lista.length > 0) {
         let eliminado = lista.pop()
-        alert("Se elimino el ultimo ejercicio de tu rutina: " + eliminado)
+        alert("Se elimino el ultimo ejercicio de tu rutina: " + eliminado.nombre)
     } else {
-        alert("No quedan ejericios para eliminar.")
+        alert("No quedan ejercicios para eliminar.")
     }
 }
 
@@ -65,11 +82,15 @@ function buscarEjercicio(lista) {
     let buscado = prompt("Que ejercicio queres consultar?")
     if (buscado === null) return
 
-    if (lista.includes(buscado)) {
-        let posicion = lista.indexOf(buscado)
-        alert("El ejercicio " + buscado + " esta en la rutina(posicion " + (posicion + 1) + ").")
+    let encontrado = lista.find(ej => ej.nombre.toLowerCase() === buscado.trim().toLowerCase())
+    if (encontrado) {
+        alert("Encontrado: " + encontrado.nombre +
+            "\nSeries: " + encontrado.series +
+            "\nReps: " + encontrado.repeticiones +
+            "\nPeso: " + encontrado.peso + "kg" +
+            "\nVolumen total: " + encontrado.calcularVolumen() + "kg")
     } else {
-        alert("El ejericio " + buscado + " no esta en la rutina.")
+        alert("El ejercicio " + buscado + " no esta en la rutina.")
     }
 }
 
@@ -77,20 +98,29 @@ function reemplazarEjercicio(lista) {
     let viejo = prompt("Que ejercicio queres reemplazar?")
     if (viejo === null) return
 
-    let posicion = lista.indexOf(viejo)
+    let posicion = lista.findIndex(ej => ej.nombre.toLowerCase() === viejo.trim().toLowerCase())
+
     if (posicion !== -1) {
-        let nuevo = prompt("Por cual queres reemplazar a " + viejo + "?")
-        if (nuevo !== null && nuevo.trim() !== "") {
-            lista.splice(posicion, 1, nuevo.trim())
-            alert("Listo! Se cambio " + viejo + " por " + nuevo + ".")
-        }
+        let nuevoNombre = prompt("Por cual queres reemplazar a " + viejo + "?")
+        if (nuevoNombre === null || nuevoNombre.trim() === "") return
+        let series = parseInt(prompt("Cantidad de series:"))
+        let reps = parseInt(prompt("Cantidad de repeticiones:"))
+        let peso = parseFloat(prompt("Peso en kg:")) || 0
+        let reemplazo = new Ejercicio(lista[posicion].id, nuevoNombre.trim(), series, reps, peso)
+        lista.splice(posicion, 1, reemplazo)
+        alert("Listo! Se cambio " + viejo + " por " + nuevoNombre + ".")
     } else {
         alert("El ejercicio " + viejo + " no existe en la rutina.")
     }
 }
 
-let ejercicios = ["Biceps", "Piernas", "Espalda", "Pecho", "Abdominales"]
+const ejercicio1 = new Ejercicio(1, "Sentadillas", 4, 10, 60)
+const ejercicio2 = new Ejercicio(2, "Press de Banca", 4, 8, 50)
+const ejercicio3 = new Ejercicio(3, "Dominadas", 3, 12, 0)
 
+let ejercicios = [ejercicio1, ejercicio2, ejercicio3]
+
+const nombre = prompt("Como te llamas?")
 while (continuar) {
     const opcion = prompt("Hola " + nombre + ", elegi una opcion: \n" +
         "1. Registrar nuevo entrenamiento \n" +
@@ -142,5 +172,4 @@ while (continuar) {
     }
 }
 console.log(nombre + ", obtuviste " + totalXP + " XP esta semana")
-
 
